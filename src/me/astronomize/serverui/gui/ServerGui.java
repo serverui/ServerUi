@@ -27,7 +27,7 @@ import org.bukkit.plugin.PluginManager;
  *  /        \  ___/|  | \/\   /\  ___/|  | \/    |  /|  |
  * /_______  /\___  >__|    \_/  \___  >__|  |______/ |__|
  *         \/     \/                 \/       
- *  Init.java
+ *  ServerGui.java
  *  
  *  Initializes the gui.
  *  
@@ -36,45 +36,60 @@ import org.bukkit.plugin.PluginManager;
  *  public static void closeGui()
  *  
  *  variables:
- *  static PluginManager manager
- *  static JFrame serverFrame
- *  static JPanel buttonPanel
- *  static JButton stopButton
- *  static PluginDescriptionFile desc
- *  static ArrayList<Plugin> plugins
- *  static ArrayList<JButton> pluginButtons
- *  static Color colour_green
- *  static Color colour_red 
- *  static Color colour_orange
+ *  private static PluginManager manager
+ *  private static JFrame serverFrame
+ *  private static JPanel buttonPanel
+ *  private static GridLayout layout
+ *  private static JButton stopButton
+ *  private static PluginDescriptionFile desc
+ *  private static ArrayList<Plugin> plugins
+ *  private static ArrayList<JButton> pluginButtons
+ *  public static ArrayList<JButton> customPluginButtons
+ *  private static Color colour_green
+ *  private static Color colour_red
+ *  private static Color colour_orange
+ *  private static Color colour_purple
  */
-public class Init {
+public class ServerGui {
 	
-	static PluginManager manager = Bukkit.getPluginManager();
-	static JFrame serverFrame;
-	static JPanel buttonPanel;
+	private static PluginManager manager = Bukkit.getPluginManager();
+	private static JFrame serverFrame;
+	private static JPanel buttonPanel;
 	
-	static GridLayout layout = new GridLayout(0, 4);
+	private static GridLayout layout = new GridLayout(0, 4);
 	
-	static JButton stopButton;
+	private static JButton stopButton;
+	private static JButton reloadButton;
+		
+	private static PluginDescriptionFile desc = manager.getPlugin("ServerUi").getDescription();
 	
+	private static ArrayList<Plugin> plugins;
+	private static ArrayList<JButton> pluginButtons;
+	public static ArrayList<JButton> customPluginButtons;
 	
-	static PluginDescriptionFile desc = manager.getPlugin("ServerUi").getDescription();
-	
-	static ArrayList<Plugin> plugins;
-	static ArrayList<JButton> pluginButtons;
-	
-	static Color colour_green = new Color(3, 204, 0);
-	static Color colour_red = new Color(244, 0, 0);
-	static Color colour_orange = new Color(255, 114, 0);
+	private static Color colour_green = new Color(3, 204, 0);
+	private static Color colour_red = new Color(244, 0, 0);
+	private static Color colour_orange = new Color(255, 114, 0);
+	private static Color colour_purple = new Color(217, 30, 234);
 	
 	public static void initGui() throws IOException {
 		serverFrame = new JFrame("ServerGui - v" + desc.getVersion() + " - " + Bukkit.getServer().getName());
 		
 		plugins = new ArrayList<>();
 		pluginButtons = new ArrayList<>();
+		customPluginButtons = new ArrayList<>();
+		
 		buttonPanel = new JPanel();
 		stopButton = new JButton("Stop Server");
+		stopButton.setBorder(new RoundedBorder(10));
+		stopButton.setToolTipText("Stops the Server.");
 		stopButton.setBackground(colour_orange);
+		
+		reloadButton = new JButton("Reload Server");
+		reloadButton.setBorder(new RoundedBorder(10));
+		reloadButton.setToolTipText("Reloads the server.");
+		reloadButton.setBackground(colour_orange);
+
 
 		buttonPanel.setBackground(Color.DARK_GRAY);
 		
@@ -87,7 +102,15 @@ public class Init {
 		    }
 		});
 		
+		reloadButton.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "reload");
+		    }
+		});
+		
 		buttonPanel.add(stopButton);
+		buttonPanel.add(reloadButton);
 		
 		// add all the plugins to the plugins list.
 		for(Plugin p : manager.getPlugins()) {
@@ -120,6 +143,7 @@ public class Init {
 		for(JButton button : pluginButtons) {
 			button.setFocusPainted(false);
 		    button.setBorder(new RoundedBorder(10));
+		    button.setToolTipText("Enable/Disable " + button.getText());
 			buttonPanel.add(button);
 			Bukkit.getLogger().info("[ServerUi] Created button for: " + button.getText());
 			
@@ -147,6 +171,13 @@ public class Init {
 				button.setBackground(colour_red);
 			}
 		}
+		
+		for(JButton button : customPluginButtons) {
+		    button.setFocusPainted(false);
+		    button.setBorder(new RoundedBorder(10));
+		    button.setBackground(colour_purple);
+	            buttonPanel.add(button);
+		}
 		serverFrame.add(buttonPanel);
 		
 		serverFrame.setResizable(true);
@@ -157,6 +188,14 @@ public class Init {
 	
 	public static void closeGui() {
 		serverFrame.setVisible(false);
+	}
+	
+	/**
+	 * 
+	 * Adds a button to the GUI.
+	 */
+	public static void addButton(Plugin p, JButton b) {
+		customPluginButtons.add(new JButton(p.getName() + " | " + b.getText()));
 	}
 	
 	private static class RoundedBorder implements Border {
