@@ -1,6 +1,10 @@
 package me.astronomize.serverui.gui;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -9,6 +13,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -40,6 +45,7 @@ import org.bukkit.plugin.PluginManager;
  *  static ArrayList<JButton> pluginButtons
  *  static Color colour_green
  *  static Color colour_red 
+ *  static Color colour_orange
  */
 public class Init {
 	
@@ -47,7 +53,10 @@ public class Init {
 	static JFrame serverFrame;
 	static JPanel buttonPanel;
 	
+	static GridLayout layout = new GridLayout(0, 4);
+	
 	static JButton stopButton;
+	
 	
 	static PluginDescriptionFile desc = manager.getPlugin("ServerUi").getDescription();
 	
@@ -56,6 +65,7 @@ public class Init {
 	
 	static Color colour_green = new Color(3, 204, 0);
 	static Color colour_red = new Color(244, 0, 0);
+	static Color colour_orange = new Color(255, 114, 0);
 	
 	public static void initGui() throws IOException {
 		serverFrame = new JFrame("ServerGui - v" + desc.getVersion() + " - " + Bukkit.getServer().getName());
@@ -64,9 +74,11 @@ public class Init {
 		pluginButtons = new ArrayList<>();
 		buttonPanel = new JPanel();
 		stopButton = new JButton("Stop Server");
-		stopButton.setBackground(colour_red);
+		stopButton.setBackground(colour_orange);
 
 		buttonPanel.setBackground(Color.DARK_GRAY);
+		
+		buttonPanel.setLayout(layout);
 		
 		stopButton.addActionListener(new ActionListener() {
 		    @Override
@@ -106,8 +118,12 @@ public class Init {
 		}
 		
 		for(JButton button : pluginButtons) {
+			button.setFocusPainted(false);
+		    button.setBorder(new RoundedBorder(10));
 			buttonPanel.add(button);
 			Bukkit.getLogger().info("[ServerUi] Created button for: " + button.getText());
+			
+			
 			button.addActionListener(new ActionListener() {
 			    @Override
 			    public void actionPerformed(ActionEvent e) {
@@ -133,7 +149,7 @@ public class Init {
 		}
 		serverFrame.add(buttonPanel);
 		
-		serverFrame.setResizable(false);
+		serverFrame.setResizable(true);
 		
 		serverFrame.pack();
 		serverFrame.setVisible(true);
@@ -142,4 +158,31 @@ public class Init {
 	public static void closeGui() {
 		serverFrame.setVisible(false);
 	}
+	
+	private static class RoundedBorder implements Border {
+
+	    private int radius;
+
+
+	    RoundedBorder(int radius) {
+	        this.radius = radius;
+	    }
+
+
+	    public Insets getBorderInsets(Component c) {
+	        return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+	    }
+
+
+	    public boolean isBorderOpaque() {
+	        return true;
+	    }
+
+
+	    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+	        g.drawRoundRect(x, y, width-1, height-1, radius, radius);
+	    }
+	}
 }
+
+
