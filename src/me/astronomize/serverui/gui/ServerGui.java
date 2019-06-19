@@ -9,15 +9,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
@@ -49,13 +52,16 @@ import org.bukkit.plugin.UnknownDependencyException;
  *  private static JButton reloadButton
  *  private static JButton loadButton
  *  private static PluginDescriptionFile desc
+ *  private static FileConfiguration config
  *  private static ArrayList<Plugin> plugins
  *  private static ArrayList<JButton> pluginButtons
- *  public static ArrayList<JButton> customPluginButtons
+ *  private static ArrayList<JButton> customPluginButtons
+ *  private static ArrayList<JButton> customCommandButtons;
  *  private static Color colour_green
  *  private static Color colour_red
  *  private static Color colour_orange
  *  private static Color colour_purple
+ *  private static Color colour_teal
  */
 public class ServerGui {
 	
@@ -68,43 +74,59 @@ public class ServerGui {
 	private static JButton stopButton;
 	private static JButton reloadButton;
 	private static JButton loadButton;
-		
+			
 	private static PluginDescriptionFile desc = manager.getPlugin("ServerUi").getDescription();
+	private static FileConfiguration config;
 	
 	private static ArrayList<Plugin> plugins;
 	private static ArrayList<JButton> pluginButtons;
-	public static ArrayList<JButton> customPluginButtons;
+	private static ArrayList<JButton> customPluginButtons;
+	private static ArrayList<JButton> customCommandButtons;
 	
+	// the colour used for enabled plugin buttons.
 	private static Color colour_green = new Color(3, 204, 0);
+	
+	// the colour used for disabled plugin buttons.
 	private static Color colour_red = new Color(244, 0, 0);
+	
+	// the colour used for server buttons(stop, reload, etc)
 	private static Color colour_orange = new Color(255, 114, 0);
+	
+	// the colour used for plugin API buttons.
 	private static Color colour_purple = new Color(217, 30, 234);
 	
-	public static void initGui() throws IOException {
+	// the colour used for custom command buttons.
+	private static Color colour_teal = new Color(0, 250, 255);
+	
+	public static void initGui() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+		config = manager.getPlugin("ServerUi").getConfig();
+		List<String> commandButtons = config.getStringList("command-buttons");
 		serverFrame = new JFrame("ServerGui - v" + desc.getVersion() + " - " + Bukkit.getServer().getName());
 		
 		plugins = new ArrayList<>();
 		pluginButtons = new ArrayList<>();
 		customPluginButtons = new ArrayList<>();
+		customCommandButtons = new ArrayList<>();
 		
 		buttonPanel = new JPanel();
 		
+		RoundedBorder border = new RoundedBorder(10);
+		
 		loadButton = new JButton("Load Plugin");
-		loadButton.setBorder(new RoundedBorder(10));
 		loadButton.setToolTipText("Stops the Server.");
+		loadButton.setBorder(border);
 		loadButton.setBackground(colour_orange);
 
 		
 		stopButton = new JButton("Stop Server");
-		stopButton.setBorder(new RoundedBorder(10));
 		stopButton.setToolTipText("Stops the Server.");
+		stopButton.setBorder(border);
 		stopButton.setBackground(colour_orange);
 		
 		reloadButton = new JButton("Reload Server");
-		reloadButton.setBorder(new RoundedBorder(10));
 		reloadButton.setToolTipText("Reloads the server.");
+		reloadButton.setBorder(border);
 		reloadButton.setBackground(colour_orange);
-
 
 		buttonPanel.setBackground(Color.DARK_GRAY);
 		
@@ -183,7 +205,7 @@ public class ServerGui {
 		
 		for(JButton button : pluginButtons) {
 			button.setFocusPainted(false);
-		    button.setBorder(new RoundedBorder(10));
+		    button.setBorder(border);
 		    button.setToolTipText("Enable/Disable " + button.getText());
 			buttonPanel.add(button);
 			Bukkit.getLogger().info("[ServerUi] Created button for: " + button.getText());
@@ -215,15 +237,42 @@ public class ServerGui {
 		
 		for(JButton button : customPluginButtons) {
 			button.setFocusPainted(false);
-		    button.setBorder(new RoundedBorder(10));
+		    button.setBorder(border);
 			button.setBackground(colour_purple);
 			buttonPanel.add(button);
 		}
-		serverFrame.add(buttonPanel);
 		
+		for(String s : commandButtons) {
+			Bukkit.getLogger().info("[ServerUi] " + s);
+			if(s.contains("/")) {
+				customCommandButtons.add(new JButton(s));
+			} else {
+				customCommandButtons.add(new JButton("/" + s));
+			}
+		}
+		
+		for(JButton button : customCommandButtons) {
+			button.setFocusPainted(false);
+		    button.setBorder(border);
+			button.setBackground(colour_teal);
+			button.setToolTipText("Runs the command: " + button.getText());
+			button.addActionListener(new ActionListener() {
+			    @Override
+			    public void actionPerformed(ActionEvent e) {
+			    	
+			    	Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), button.getText().replaceAll("/", ""));
+			    	
+			    }
+			});
+			
+			buttonPanel.add(button);
+		}
+		serverFrame.add(buttonPanel);
 		serverFrame.setResizable(true);
 		
 		serverFrame.pack();
+		
+		
 		serverFrame.setVisible(true);
 	}
 	
