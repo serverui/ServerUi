@@ -1,0 +1,17 @@
+#  _________                                ____ ___.__ 
+# /   _____/ ______________  __ ___________|    |   \__|
+# \_____  \_/ __ \_  __ \  \/ // __ \_  __ \    |   /  |
+# /        \  ___/|  | \/\   /\  ___/|  | \/    |  /|  |
+#/_______  /\___  >__|    \_/  \___  >__|  |______/ |__|
+#        \/     \/                 \/                
+#
+# Config.yml
+
+# Custom Commands
+# add a string to the list like the one below, and restart your server, and there should be new buttons for
+# all the commands in the 'command-buttons' list!
+
+# if you do not want these commands, then just remove all the commands in the list and leave it empty.
+
+# this is an example command
+command-buttons: ['help']
