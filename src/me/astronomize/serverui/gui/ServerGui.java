@@ -11,14 +11,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.UnknownDependencyException;
 
 /*
  *   _________                                ____ ___.__ 
@@ -41,6 +46,8 @@ import org.bukkit.plugin.PluginManager;
  *  private static JPanel buttonPanel
  *  private static GridLayout layout
  *  private static JButton stopButton
+ *  private static JButton reloadButton
+ *  private static JButton loadButton
  *  private static PluginDescriptionFile desc
  *  private static ArrayList<Plugin> plugins
  *  private static ArrayList<JButton> pluginButtons
@@ -60,6 +67,7 @@ public class ServerGui {
 	
 	private static JButton stopButton;
 	private static JButton reloadButton;
+	private static JButton loadButton;
 		
 	private static PluginDescriptionFile desc = manager.getPlugin("ServerUi").getDescription();
 	
@@ -80,6 +88,13 @@ public class ServerGui {
 		customPluginButtons = new ArrayList<>();
 		
 		buttonPanel = new JPanel();
+		
+		loadButton = new JButton("Load Plugin");
+		loadButton.setBorder(new RoundedBorder(10));
+		loadButton.setToolTipText("Stops the Server.");
+		loadButton.setBackground(colour_orange);
+
+		
 		stopButton = new JButton("Stop Server");
 		stopButton.setBorder(new RoundedBorder(10));
 		stopButton.setToolTipText("Stops the Server.");
@@ -94,6 +109,31 @@ public class ServerGui {
 		buttonPanel.setBackground(Color.DARK_GRAY);
 		
 		buttonPanel.setLayout(layout);
+		
+		loadButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser chooser = new JFileChooser();
+			    FileNameExtensionFilter filter = new FileNameExtensionFilter("Jar Files", "jar");
+			    chooser.setFileFilter(filter);
+			    int ret = chooser.showOpenDialog(chooser);
+			    if(ret == JFileChooser.APPROVE_OPTION) {
+			    	try {
+						manager.loadPlugin(chooser.getSelectedFile());
+					} catch (UnknownDependencyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidPluginException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidDescriptionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }
+			}
+			
+		});
 		
 		stopButton.addActionListener(new ActionListener() {
 		    @Override
@@ -111,6 +151,7 @@ public class ServerGui {
 		
 		buttonPanel.add(stopButton);
 		buttonPanel.add(reloadButton);
+		buttonPanel.add(loadButton);
 		
 		// add all the plugins to the plugins list.
 		for(Plugin p : manager.getPlugins()) {
@@ -173,10 +214,10 @@ public class ServerGui {
 		}
 		
 		for(JButton button : customPluginButtons) {
-		    button.setFocusPainted(false);
+			button.setFocusPainted(false);
 		    button.setBorder(new RoundedBorder(10));
-		    button.setBackground(colour_purple);
-	            buttonPanel.add(button);
+			button.setBackground(colour_purple);
+			buttonPanel.add(button);
 		}
 		serverFrame.add(buttonPanel);
 		
