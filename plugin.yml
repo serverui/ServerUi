@@ -1,5 +1,19 @@
 name: ServerUi
 
-version: 0.00.00
+version: 0.01.01
 
 main: me.astronomize.serverui.ServerUi
+
+commands:
+  serverui:
+    description: shows a help menu.
+    permission: serverui.ingame.help
+  pl:
+    description: shows a list of plugins.
+    permission: serverui.ingame.pluginlist
+  enable:
+    description: enables a plugin.
+    permission: serverui.ingame.enable
+  disable:
+    description: disables a plugin.
+    permission: serverui.ingame.disable
