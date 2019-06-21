@@ -10,8 +10,12 @@
 # Custom Commands
 # add a string to the list like the one below, and restart your server, and there should be new buttons for
 # all the commands in the 'command-buttons' list!
-
 # if you do not want these commands, then just remove all the commands in the list and leave it empty.
-
 # this is an example command
 command-buttons: ['help']
+
+# automatically disables known incompatible plugins if set to true, if set to false, the plugin ignores the incompatible plugins.
+auto-disable-incompatible-plugins: true
+
+# when set to true, the plugin will check for updates, and give you a console message when there is a new version!
+check-for-updates: true
