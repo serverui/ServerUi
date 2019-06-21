@@ -113,13 +113,13 @@ public class ServerGui {
 		RoundedBorder border = new RoundedBorder(10);
 		
 		loadButton = new JButton("Load Plugin");
-		loadButton.setToolTipText("Stops the Server.");
+		loadButton.setToolTipText("Loads a plugin.");
 		loadButton.setBorder(border);
 		loadButton.setBackground(colour_orange);
 
 		
 		stopButton = new JButton("Stop Server");
-		stopButton.setToolTipText("Stops the Server.");
+		stopButton.setToolTipText("Stops the server.");
 		stopButton.setBorder(border);
 		stopButton.setBackground(colour_orange);
 		
@@ -127,6 +127,7 @@ public class ServerGui {
 		reloadButton.setToolTipText("Reloads the server.");
 		reloadButton.setBorder(border);
 		reloadButton.setBackground(colour_orange);
+		
 
 		buttonPanel.setBackground(Color.DARK_GRAY);
 		
@@ -243,7 +244,6 @@ public class ServerGui {
 		}
 		
 		for(String s : commandButtons) {
-			Bukkit.getLogger().info("[ServerUi] " + s);
 			if(s.contains("/")) {
 				customCommandButtons.add(new JButton(s));
 			} else {
